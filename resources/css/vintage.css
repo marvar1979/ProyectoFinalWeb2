@@ -1,0 +1,149 @@
+/*
+|--------------------------------------------------------------------------
+| Estilos Vintage para la Librería
+|--------------------------------------------------------------------------
+*/
+
+:root {
+    --sepia-light: #F5E8C7;
+    --sepia-medium: #C19A6B;
+    --sepia-dark: #5C4033;
+    --accent-gold: #FFD700;
+}
+
+/* --- ESTILOS GENERALES Y PÚBLICOS --- */
+
+body {
+    background-color: var(--sepia-light);
+    font-family: 'Georgia', serif;
+    color: #3E2F1C;
+}
+
+.btn-vintage {
+    background-color: var(--sepia-dark);
+    color: white;
+    border: 2px solid var(--sepia-dark);
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+.btn-vintage:hover {
+    background-color: var(--accent-gold);
+    color: var(--sepia-dark);
+    border-color: var(--accent-gold);
+}
+
+.card-book {
+    background-color: rgba(255, 253, 248, 0.89);
+    border: 1px solid var(--sepia-medium);
+    border-radius: 8px;
+}
+
+.navbar, footer {
+    background-color: var(--sepia-dark);
+}
+.navbar .nav-link, .navbar .navbar-brand, footer {
+    color: white !important;
+}
+.navbar .nav-link:hover, footer a:hover {
+    color: var(--accent-gold) !important;
+}
+
+input.form-control, textarea.form-control, select.form-select {
+    border-radius: 5px;
+    border: 1.5px solid var(--sepia-medium);
+    background-color: #FFF9E5;
+}
+input.form-control:focus, textarea.form-control:focus, select.form-select:focus {
+    border-color: var(--accent-gold);
+    outline: none;
+    background-color: #FFF4D2;
+}
+
+/* --- ESTILOS ESPECÍFICOS DEL PANEL DE ADMINISTRACIÓN --- */
+
+.admin-panel-bg {
+    background-color: #EDE4D1;
+}
+
+/* Navbar del Admin */
+.admin-navbar {
+    background-color: var(--sepia-dark);
+    border-bottom: 3px solid var(--accent-gold);
+}
+.admin-navbar .dropdown-menu {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+}
+.admin-navbar .dropdown-item:hover {
+    background-color: var(--sepia-dark);
+    color: var(--accent-gold);
+}
+
+
+/* ¡ESTA ES LA CLASE CLAVE PARA LOS BOTONES! */
+.admin-dashboard-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--sepia-dark);
+    color: white;
+    text-decoration: none;
+    padding: 25px 15px;
+    border-radius: 8px;
+    height: 160px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: 2px solid #4a3328;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.admin-dashboard-card:hover {
+    background-color: var(--accent-gold);
+    color: var(--sepia-dark);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 15px rgba(0,0,0,0.3);
+}
+
+.admin-dashboard-card i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.admin-dashboard-card:hover i {
+    color: var(--sepia-dark);
+}
+
+.admin-welcome-title {
+    color: var(--sepia-dark);
+    font-family: 'Georgia', serif;
+    font-weight: bold;
+    letter-spacing: 1px;
+} 
+
+/* ------------------------------------------------
+   Botón personalizado estilo vintage
+-------------------------------------------------- */
+button.btn-submit-custom {
+  background-color: var(--sepia-dark) !important;
+  color: white !important;
+  border: 2px solid var(--sepia-dark) !important;
+  border-radius: 6px !important;
+  padding: 10px 20px !important;
+  font-weight: bold !important;
+  transition: all 0.2s !important;
+  cursor: pointer !important;
+  display: inline-block !important;
+  text-align: center !important;
+}
+button.btn-submit-custom:hover {
+  background-color: var(--accent-gold) !important;
+  color: var(--sepia-dark) !important;
+  border-color: var(--accent-gold) !important;
+}
