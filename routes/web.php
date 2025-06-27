@@ -1,24 +1,23 @@
 <?php
 
-
-// Ruta raíz: comprobación de conexión DB
-// routes/web.php
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-// login & logout
+// Login & Logout
 Route::get ('/login',  [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login',  [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Productos protegidos
+// CRUD Productos protegido
 Route::middleware('auth')->group(function () {
     Route::resource('products', ProductController::class);
+    Route::resource('users',    UserController::class);
 });
 
-// Ruta raíz para tu prueba de conexión (puedes quitarla cuando quieras)
+// Ruta raíz para comprobación de conexión DB
 Route::get('/', function () {
     try {
         $users    = DB::table('users')->get();
