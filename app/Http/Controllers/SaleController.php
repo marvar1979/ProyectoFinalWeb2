@@ -10,25 +10,76 @@ use Illuminate\Support\Facades\DB;
 
 class SaleController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');          // usuario o cajero
-    }
+
 
     /* === Listar ventas === */
     public function index()
-    {
-        $sales = auth()->user()->isAdmin()
-            ? Sale::with('buyer')->latest()->get()
-            : Sale::where('buyer_id', auth()->id())->latest()->get();
+{
+    // Ventas completas con comprador y detalles
+    $query = Sale::with(['buyer', 'details'])
+                 ->orderBy('sale_date', 'desc');
 
-        return view('sales.index', compact('sales'));
+    if (! auth()->user()->isAdmin()) {
+        $query->where('buyer_id', auth()->id());
     }
 
+    $sales = $query->get();
+
+    // Subconsulta para últimas 5 ventas con total
+    $totalSales = DB::table('sales')
+    ->join('users', 'sales.buyer_id', '=', 'users.id')
+    ->join('sale_details', 'sales.id', '=', 'sale_details.sale_id')
+    ->select(
+        'sales.id as sale_id',
+        'sales.sale_date',
+        'sales.buyer_type',
+        'users.name as buyer_name',
+        DB::raw('SUM(COALESCE(sale_details.quantity,0) * COALESCE(sale_details.price,0)) as total')
+    )
+    ->groupBy('sales.id', 'sales.sale_date', 'sales.buyer_type', 'users.name')
+    ->orderBy('sales.sale_date', 'desc')
+    ->take(5)
+    ->get();
+
+
+    return view('sales.index', compact('sales', 'totalSales'));
+}
+
+public function indexC()
+{
+    // Ventas completas con comprador y detalles
+    $query = Sale::with(['buyer', 'details'])
+                 ->orderBy('sale_date', 'desc');
+
+    if (! auth()->user()->isAdmin()) {
+        $query->where('buyer_id', auth()->id());
+    }
+
+    $sales = $query->get();
+
+    // Subconsulta para últimas 5 ventas con total
+    $totalSales = DB::table('sales')
+    ->join('users', 'sales.buyer_id', '=', 'users.id')
+    ->join('sale_details', 'sales.id', '=', 'sale_details.sale_id')
+    ->select(
+        'sales.id as sale_id',
+        'sales.sale_date',
+        'sales.buyer_type',
+        'users.name as buyer_name',
+        DB::raw('SUM(COALESCE(sale_details.quantity,0) * COALESCE(sale_details.price,0)) as total')
+    )
+    ->groupBy('sales.id', 'sales.sale_date', 'sales.buyer_type', 'users.name')
+    ->orderBy('sales.sale_date', 'desc')
+    ->take(5)
+    ->get();
+
+
+    return view('sales.indexC', compact('sales', 'totalSales'));
+}
     /* === Formulario para crear venta === */
     public function create()
     {
-        $products = Product::where('stock','>',0)->get();
+        $products = Product::where('stock', '>', 0)->get();
         return view('sales.create', compact('products'));
     }
 
@@ -36,24 +87,28 @@ class SaleController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'items'   => 'required|array',           // [ [id, qty], ... ]
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity'   => 'required|integer|min:1'
+            'items'                => 'required|array',
+            'items.*.product_id'   => 'required|exists:products,id',
+            'items.*.quantity'     => 'required|integer|min:1',
         ]);
 
         DB::transaction(function() use ($data) {
-            $buyer          = auth()->user();
-            $sale           = Sale::create([
+            $buyer = auth()->user();
+
+            $sale = Sale::create([
                 'buyer_id'   => $buyer->id,
-                'buyer_type' => $buyer->isCashier() ? 'cajero' : 'usuario',
+                'buyer_type' => $buyer->isCashier() ? 'cajero' : 'cliente',
                 'sale_date'  => now(),
             ]);
 
             foreach ($data['items'] as $item) {
                 $product = Product::lockForUpdate()->find($item['product_id']);
 
-                if ($product->stock < $item['quantity'])
-                    abort(409, "Stock insuficiente en {$product->name}");
+                abort_if(
+                    $product->stock < $item['quantity'],
+                    409,
+                    "Stock insuficiente en {$product->name}"
+                );
 
                 $product->decrement('stock', $item['quantity']);
 
@@ -61,20 +116,25 @@ class SaleController extends Controller
                     'sale_id'    => $sale->id,
                     'product_id' => $product->id,
                     'quantity'   => $item['quantity'],
-                    'price'      => $product->price
+                    'price'      => $product->price,
                 ]);
             }
         });
 
-        return redirect()->route('sales.index')->with('ok','Venta realizada');
+        return redirect()
+            ->route('sales.index')
+            ->with('ok', 'Venta realizada con éxito');
     }
 
     /* === Mostrar venta === */
     public function show(Sale $sale)
     {
-        $this->authorize('view', $sale); // Política opcional
-        return view('sales.show', $sale->load('details.product', 'buyer'));
-    }
+        // Política de acceso (opcional)
+        $this->authorize('view', $sale);
 
-    /* Métodos edit / update / destroy → opcionales (p. ej. devolver/cancelar venta) */
+        // Eager-load de detalles y producto para el detalle
+        $sale->load(['details.product', 'buyer']);
+
+        return view('sales.show', compact('sale'));
+    }
 }

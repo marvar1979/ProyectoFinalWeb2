@@ -1,4 +1,4 @@
-<footer class="text-center mt-auto">
+<footer class="text-center mt-auto footer-cliente">
   <div class="container py-4">
     <p class="mb-1">Estamos aquí para ayudarte y resolver cualquier duda.</p>
     <p class="mb-3">¡Conéctate con nosotros a través de nuestras redes sociales o visítanos en nuestra tienda!</p>

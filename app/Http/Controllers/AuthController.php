@@ -1,40 +1,53 @@
 <?php
 
-// app/Http/Controllers/AuthController.php
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    // Muestra formulario
+    /* Formulario de login (solo invitados) */
     public function showLogin()
     {
-        return view('login');
+        return view('login');   // resources/views/login.blade.php
     }
 
-    // Procesa login
-    public function login(Request $r)
+    /* Procesa login */
+    public function login(Request $request)
     {
-        $cred = $r->validate([
-            'email'    => 'required|email',
-            'password' => 'required',
+        $credentials = $request->validate([
+            'email'    => ['required','email'],
+            'password' => ['required'],
         ]);
 
-        if (Auth::attempt($cred)) {
-            $r->session()->regenerate();
-            return redirect()->intended('products');
+        // Throttle: 5 intentos/1 minuto (opcional)
+        if (! Auth::attempt($credentials, $request->boolean('remember'))) {
+            throw ValidationException::withMessages([
+                'email' => 'Credenciales inválidas.',
+            ]);
         }
-        return back()->withErrors(['email'=>'Credenciales inválidas']);
+
+        $request->session()->regenerate();
+
+        /* Redirección por rol */
+        $role = Auth::user()->role;
+        return match ($role) {
+            'administrador'  => redirect()->intended('/dashboard'),
+            'cajero' => redirect()->intended('/pos'),
+            default  => redirect()->intended(route('cliente.home')),
+        };
     }
 
-    // Cierra sesión
-    public function logout(Request $r)
+    /* Cierra sesión */
+    public function logout(Request $request)
     {
         Auth::logout();
-        $r->session()->invalidate();
-        $r->session()->regenerateToken();
-        return redirect('/login');
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login');
     }
 }

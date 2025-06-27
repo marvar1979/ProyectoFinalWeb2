@@ -17,10 +17,8 @@
     <div class="header-container">
       <h1 class="main-title">Panel de Administración</h1>
       <nav class="nav">
-        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">Dashboard</a>
-        <a href="{{ route('products.index') }}" class="nav-link {{ request()->routeIs('products.*') ? 'active' : '' }}">Productos</a>
-        <a href="{{ route('users.index') }}" class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">Usuarios</a>
-        <a href="{{ route('sales.index') }}" class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}">Ventas</a>
+        <a href="{{ route('sales.indexC') }}" class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}">Ventas</a>
+        <a href="{{ route('sales.create') }}" class="nav-link {{ request()->routeIs('sales.*') ? 'active' : '' }}">Vender</a>
 
       </nav>
     </div>
